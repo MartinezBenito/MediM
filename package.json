@@ -1,0 +1,11 @@
+{
+  "name": "lux-health",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "live-server --open=index.html --port=5174 --ignore=node_modules"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

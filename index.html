@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LuxHealth | Gestión Clínica y Pacientes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-light: #e6f2ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f9fafb;
+            --card: #ffffff;
+            --text: #111827;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Layout Principal */
+        .app {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            color: var(--text-light);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: none;
+            font-size: 14px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-logout:hover {
+            background: var(--bg);
+        }
+
+        /* Content Area */
+        .content {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Grid Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 12px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Botones */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        /* Lista */
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .list-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .list-item-info h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .list-item-info p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 16px;
+            }
+            .content {
+                padding: 16px;
+            }
+        }
+
+        /* Utilidades */
+        .mt-4 { margin-top: 32px; }
+        .mb-2 { margin-bottom: 16px; }
+        .text-center { text-align: center; }
+
+        .alert {
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">💊 LuxHealth</div>
+            <ul class="nav-menu" id="navMenu"></ul>
+        </aside>
+
+        <!-- Main -->
+        <div class="main">
+            <!-- Header -->
+            <header class="header">
+                <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                <div class="user-menu">
+                    <span id="userName" style="font-size: 14px; color: var(--text-light);">Usuario</span>
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <button class="btn-logout" onclick="logout()">Salir</button>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="content">
+                <!-- Section: Login -->
+                <section id="loginSection" class="section active">
+                    <div class="card" style="max-width: 400px; margin: 60px auto;">
+                        <h2 class="card-title mb-2">Iniciar Sesión</h2>
+                        <form onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Contraseña</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+                        </form>
+                        <div class="alert alert-success" style="margin-top: 16px; font-size: 12px;">
+                            <strong>Demo:</strong> Usa "admin@test.com" o "paciente@test.com"
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Dashboard Paciente -->
+                <section id="dashboardPacienteSection" class="section">
+                    <div class="grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Próxima Cita</div>
+                                    <div class="card-subtitle">En 3 días</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-light); margin: 16px 0;">
+                                <strong>Dr. García López</strong><br>
+                                <span>Cardiología - 2026-02-21 10:00</span>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showModal('appointmentModal')">Ver Detalles</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Indicadores de Salud</div>
+                                    <div class="card-subtitle">Últimos valores</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px;">
+                                <div style="display: flex; justify-content: space-between; margin: 12px 0;">
+                                    <span>Presión: <strong>120/80</strong></span>
+                                    <span class="badge badge-success">Normal</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 12px 0;">
+                                    <span>Glucosa: <strong>95</strong></span>
+                                    <span class="badge badge-success">Normal</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 12px 0;">
+                                    <span>Peso: <strong>72 kg</strong></span>
+                                    <span class="badge badge-success">Normal</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showModal('metricsModal')" style="margin-top: 16px; width: 100%;">Registrar Nuevos</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Mis Logros</div>
+                                    <div class="card-subtitle">Progreso semanal</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px;">
+                                <div style="margin: 12px 0;">🏃 <strong>5 km caminados</strong> (Meta: 10 km)</div>
+                                <div style="margin: 12px 0;">💊 <strong>4/7 medicinas</strong> (Meta: Diarias)</div>
+                                <div style="margin: 12px 0;">📋 <strong>1 cita completada</strong> (Meta: 2)</div>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showModal('achievementsModal')" style="margin-top: 16px; width: 100%;">Ver Todos</button>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">Alertas Médicas</div>
+                                    <div class="card-subtitle">2 notificaciones</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 14px;">
+                                <div style="background: #fef3c7; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                                    <strong>⚠️ Recordatorio:</strong> Toma tu medicina a las 8:00 AM
+                                </div>
+                                <div style="background: #d1fae5; padding: 12px; border-radius: 8px; margin: 12px 0;">
+                                    <strong>✓ Info:</strong> Tu presión está en rango normal
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Citas Paciente -->
+                <section id="citasPacienteSection" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Mis Citas</h2>
+                        <button class="btn btn-primary" onclick="showModal('newAppointmentModal')">+ Nueva Cita</button>
+                    </div>
+                    <div class="list" id="appointmentsList"></div>
+                </section>
+
+                <!-- Section: Expediente -->
+                <section id="expedienteSection" class="section">
+                    <h2 style="margin-bottom: 24px;">Mi Expediente Médico</h2>
+                    <div class="grid">
+                        <div class="card">
+                            <div class="card-title mb-2">Datos Personales</div>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div><strong>Nombre:</strong> Juan Pérez</div>
+                                <div><strong>Edad:</strong> 35 años</div>
+                                <div><strong>Tipo Sangre:</strong> O+</div>
+                                <div><strong>Alergias:</strong> Penicilina</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title mb-2">Condiciones Médicas</div>
+                            <div style="font-size: 14px; line-height: 1.8;">
+                                <div>• Hipertensión controlada</div>
+                                <div>• Diabetes tipo 2</div>
+                                <div>• Obesidad leve</div>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="showModal('editConditionsModal')" style="margin-top: 16px; width: 100%;">Actualizar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Dashboard Admin -->
+                <section id="dashboardAdminSection" class="section">
+                    <div class="grid">
+                        <div class="card">
+                            <div class="card-title mb-2">Pacientes Activos</div>
+                            <div class="card-value">24</div>
+                            <div class="card-subtitle">Este mes</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title mb-2">Citas Programadas</div>
+                            <div class="card-value">18</div>
+                            <div class="card-subtitle">Próximas 7 días</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title mb-2">Alertas Activas</div>
+                            <div class="card-value">5</div>
+                            <div class="card-subtitle">Requieren atención</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section: Gestión de Pacientes (Admin) -->
+                <section id="gestionPacientesSection" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Gestión de Pacientes</h2>
+                        <button class="btn btn-primary" onclick="showModal('newPatientModal')">+ Nuevo Paciente</button>
+                    </div>
+                    <div class="list" id="patientsList"></div>
+                </section>
+
+                <!-- Section: Gestión de Citas (Admin) -->
+                <section id="gestionCitasSection" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Gestión de Citas</h2>
+                    </div>
+                    <div class="list" id="appointmentsAdminList"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: New Appointment (Patient) -->
+    <div class="modal" id="newAppointmentModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Solicitar Nueva Cita</h3>
+            <button class="modal-close" onclick="closeModal('newAppointmentModal')">×</button>
+            <form onsubmit="handleNewAppointment(event)">
+                <div class="form-group">
+                    <label>Especialidad</label>
+                    <select id="speciality" required>
+                        <option value="">Selecciona una especialidad</option>
+                        <option value="1">Cardiología</option>
+                        <option value="2">Neumología</option>
+                        <option value="3">Pediatría</option>
+                        <option value="4">Oftalmología</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Médico</label>
+                    <select id="doctorId" required>
+                        <option value="">Selecciona un médico</option>
+                        <option value="1">Dr. García López</option>
+                        <option value="2">Dra. Martínez Rodríguez</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha Preferida</label>
+                    <input type="date" id="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Motivo de la Cita</label>
+                    <textarea id="appointmentReason" placeholder="Describe brevemente el motivo..." required></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Solicitar Cita</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newAppointmentModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Appointment Details -->
+    <div class="modal" id="appointmentModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Detalles de Cita</h3>
+            <button class="modal-close" onclick="closeModal('appointmentModal')">×</button>
+            <div style="font-size: 14px; line-height: 1.8;">
+                <div><strong>Médico:</strong> Dr. García López</div>
+                <div><strong>Especialidad:</strong> Cardiología</div>
+                <div><strong>Fecha:</strong> 2026-02-21</div>
+                <div><strong>Hora:</strong> 10:00 AM</div>
+                <div><strong>Consultorio:</strong> 301</div>
+                <div style="margin-top: 20px;">
+                    <strong>Recordatorios:</strong>
+                    <div style="margin-top: 8px; color: var(--text-light);">
+                        ✓ Email enviado<br>
+                        ✓ SMS enviado
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 24px;">
+                <button class="btn btn-secondary" onclick="closeModal('appointmentModal')">Cerrar</button>
+                <button class="btn btn-secondary" onclick="cancelAppointment()">Cancelar Cita</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Metrics -->
+    <div class="modal" id="metricsModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Registrar Indicadores</h3>
+            <button class="modal-close" onclick="closeModal('metricsModal')">×</button>
+            <form onsubmit="handleSaveMetrics(event)">
+                <div class="form-group">
+                    <label>Presión Arterial (SYS/DIA)</label>
+                    <input type="text" placeholder="120/80" id="bloodPressure" required>
+                </div>
+                <div class="form-group">
+                    <label>Glucosa (mg/dL)</label>
+                    <input type="number" id="glucose" required>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="weight" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Temperatura (°C)</label>
+                    <input type="number" id="temperature" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Notas</label>
+                    <textarea id="metricsNotes" placeholder="Observaciones adicionales..."></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('metricsModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Achievements -->
+    <div class="modal" id="achievementsModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Mis Logros y Retos</h3>
+            <button class="modal-close" onclick="closeModal('achievementsModal')">×</button>
+            <div style="font-size: 14px;">
+                <div style="background: var(--primary-light); padding: 16px; border-radius: 8px; margin: 12px 0;">
+                    <div style="font-weight: 600; color: var(--primary);">🏃 Reto: 10km Caminados</div>
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--text-light);">Progreso: 5/10 km (50%)</div>
+                    <div style="margin-top: 8px; background: white; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: var(--primary); height: 100%; width: 50%;"></div>
+                    </div>
+                </div>
+                <div style="background: #d1fae5; padding: 16px; border-radius: 8px; margin: 12px 0;">
+                    <div style="font-weight: 600; color: var(--success);">✓ Logro Desbloqueado: Semana Saludable</div>
+                    <div style="margin-top: 8px; font-size: 12px; color: var(--text-light);">Completaste 5 días de ejercicio</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: New Patient (Admin) -->
+    <div class="modal" id="newPatientModal">
+        <div class="modal-content">
+            <h3 class="modal-header">Registrar Nuevo Paciente</h3>
+            <button class="modal-close" onclick="closeModal('newPatientModal')">×</button>
+            <form onsubmit="handleNewPatient(event)">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="newPatientName" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="newPatientEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" id="newPatientPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" id="newPatientDOB" required>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newPatientModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // ==================== ESTADO GLOBAL ====================
+        let currentUser = null;
+        let userRole = null;
+
+        // ==================== FUNCIONES CORE ====================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function updateUI() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.innerHTML = '';
+
+            if (!currentUser) {
+                navMenu.innerHTML = '<li class="nav-item"><button class="nav-link active" onclick="showSection(\'loginSection\')">🔑 Iniciar Sesión</button></li>';
+                return;
+            }
+
+            document.getElementById('userName').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = currentUser.email[0].toUpperCase();
+
+            if (userRole === 'paciente') {
+                const pacienteNav = [
+                    { id: 'dashboardPacienteSection', name: '📊 Dashboard' },
+                    { id: 'citasPacienteSection', name: '📅 Mis Citas' },
+                    { id: 'expedienteSection', name: '📋 Mi Expediente' }
+                ];
+                pacienteNav.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'nav-link';
+                    btn.textContent = item.name;
+                    btn.onclick = () => showSection(item.id);
+                    const li = document.createElement('li');
+                    li.className = 'nav-item';
+                    li.appendChild(btn);
+                    navMenu.appendChild(li);
+                });
+            } else if (userRole === 'admin') {
+                const adminNav = [
+                    { id: 'dashboardAdminSection', name: '📊 Dashboard' },
+                    { id: 'gestionPacientesSection', name: '👥 Pacientes' },
+                    { id: 'gestionCitasSection', name: '📅 Citas' }
+                ];
+                adminNav.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'nav-link';
+                    btn.textContent = item.name;
+                    btn.onclick = () => showSection(item.id);
+                    const li = document.createElement('li');
+                    li.className = 'nav-item';
+                    li.appendChild(btn);
+                    navMenu.appendChild(li);
+                });
+            }
+
+            showSection(userRole === 'paciente' ? 'dashboardPacienteSection' : 'dashboardAdminSection');
+        }
+
+        // ==================== AUTH ====================
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            currentUser = { email, id: 'user_123' };
+            userRole = email.includes('admin') ? 'admin' : 'paciente';
+
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+
+            updateUI();
+            alert(`¡Bienvenido ${email}!`);
+        }
+
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            updateUI();
+            showSection('loginSection');
+        }
+
+        // ==================== CITAS ====================
+        function handleNewAppointment(e) {
+            e.preventDefault();
+            const data = {
+                speciality: document.getElementById('speciality').value,
+                doctor: document.getElementById('doctorId').value,
+                date: document.getElementById('appointmentDate').value,
+                reason: document.getElementById('appointmentReason').value
+            };
+            alert('Cita solicitada:\n' + JSON.stringify(data, null, 2));
+            closeModal('newAppointmentModal');
+            showSection('citasPacienteSection');
+        }
+
+        function cancelAppointment() {
+            alert('Cita cancelada');
+            closeModal('appointmentModal');
+        }
+
+        // ==================== INDICADORES ====================
+        function handleSaveMetrics(e) {
+            e.preventDefault();
+            const data = {
+                presion: document.getElementById('bloodPressure').value,
+                glucosa: document.getElementById('glucose').value,
+                peso: document.getElementById('weight').value,
+                temperatura: document.getElementById('temperature').value,
+                notas: document.getElementById('metricsNotes').value
+            };
+            alert('Indicadores guardados:\n' + JSON.stringify(data, null, 2));
+            closeModal('metricsModal');
+        }
+
+        // ==================== PACIENTES ====================
+        function handleNewPatient(e) {
+            e.preventDefault();
+            const data = {
+                nombre: document.getElementById('newPatientName').value,
+                email: document.getElementById('newPatientEmail').value,
+                telefono: document.getElementById('newPatientPhone').value,
+                nacimiento: document.getElementById('newPatientDOB').value
+            };
+            alert('Paciente registrado:\n' + JSON.stringify(data, null, 2));
+            closeModal('newPatientModal');
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUI();
+            const appointmentsList = document.getElementById('appointmentsList');
+            appointmentsList.innerHTML = `
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>Dr. García López - Cardiología</h3>
+                        <p>2026-02-21 10:00 AM | Consultorio 301</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-secondary btn-small" onclick="showModal('appointmentModal')">Ver</button>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-info">
+                        <h3>Dra. Martínez - Neumología</h3>
+                        <p>2026-02-28 14:30 PM | Consultorio 205</p>
+                    </div>
+                    <div class="list-item-actions">
+                        <button class="btn btn-secondary btn-small" onclick="showModal('appointmentModal')">Ver</button>
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
