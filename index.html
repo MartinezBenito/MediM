@@ -458,7 +458,7 @@
                 <!-- Header -->
                 <header class="header">
                     <h1 class="header-title" id="pageTitle">Dashboard</h1>
-                    <div class="user-menu">
+                    <div class="user-menu" id="userMenu">
                         <span
                             id="userName"
                             style="font-size: 14px; color: var(--text-light)"
@@ -1046,13 +1046,19 @@
                 const navMenu = document.getElementById(
                     "navMenu",
                 );
+                const userMenu = document.getElementById(
+                    "userMenu",
+                );
                 navMenu.innerHTML = "";
 
                 if (!currentUser) {
                     navMenu.innerHTML =
                         '<li class="nav-item"><button class="nav-link active" onclick="showSection(\'loginSection\')">🔑 Iniciar Sesión</button></li>';
+                    userMenu.style.display = "none";
                     return;
                 }
+
+                userMenu.style.display = "flex";
 
                 document.getElementById("userName")
                     .textContent = currentUser.email;
