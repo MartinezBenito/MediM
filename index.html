@@ -508,8 +508,43 @@
                                 class="alert alert-success"
                                 style="margin-top: 16px; font-size: 12px"
                             >
-                                <strong>Demo:</strong> Usa "admin@test.com" o
-                                "paciente@test.com"
+                                <strong>Nota:</strong> Inicia sesión o crea una cuenta nueva.
+                            </div>
+                            <div style="text-align:center; margin-top: 16px;">
+                                <button type="button" class="btn btn-secondary" onclick="showSection('registerSection')" style="width: 100%;">Crear una cuenta nueva</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section: Registro -->
+                    <section id="registerSection" class="section">
+                        <div class="card" style="max-width: 400px; margin: 60px auto;">
+                            <h2 class="card-title mb-2">Crear Cuenta</h2>
+                            <form onsubmit="handleRegister(event)">
+                                <div class="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" id="regNombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Apellido</label>
+                                    <input type="text" id="regApellido" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" id="regEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="tel" id="regTelefono" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Contraseña</label>
+                                    <input type="password" id="regPassword" required minlength="6">
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Registrarme</button>
+                            </form>
+                            <div style="text-align:center; margin-top: 16px;">
+                                <button type="button" class="btn btn-secondary" onclick="showSection('loginSection')" style="width: 100%;">Ya tengo cuenta, iniciar sesión</button>
                             </div>
                         </div>
                     </section>
@@ -639,25 +674,16 @@
                                 <div class="card-title mb-2">
                                     Datos Personales
                                 </div>
-                                <div style="font-size: 14px; line-height: 1.8">
-                                    <div>
-                                        <strong>Nombre:</strong> Juan Pérez
-                                    </div>
-                                    <div><strong>Edad:</strong> 35 años</div>
-                                    <div><strong>Tipo Sangre:</strong> O+</div>
-                                    <div>
-                                        <strong>Alergias:</strong> Penicilina
-                                    </div>
+                                <div id="patientProfileContainer" style="font-size: 14px; line-height: 1.8">
+                                    <em>Cargando expediente...</em>
                                 </div>
                             </div>
                             <div class="card">
                                 <div class="card-title mb-2">
                                     Condiciones Médicas
                                 </div>
-                                <div style="font-size: 14px; line-height: 1.8">
-                                    <div>• Hipertensión controlada</div>
-                                    <div>• Diabetes tipo 2</div>
-                                    <div>• Obesidad leve</div>
+                                <div id="patientConditionsContainer" style="font-size: 14px; line-height: 1.8">
+                                    <em>Cargando condiciones...</em>
                                 </div>
                                 <button
                                     class="btn btn-secondary btn-small"
@@ -1139,6 +1165,40 @@
                     sectionId === "citasPacienteSection"
                 ) {
                     await loadPatientAppointments();
+                } else if (
+                    sectionId === "expedienteSection"
+                ) {
+                    await loadPatientProfile();
+                }
+            }
+
+            async function loadPatientProfile() {
+                const container = document.getElementById("patientProfileContainer");
+                const conditionsContainer = document.getElementById("patientConditionsContainer");
+                
+                if (!container) return;
+
+                const { data, error } = await supabaseClient
+                    .from("pacientes")
+                    .select("*")
+                    .eq("auth_uid", currentUser.id)
+                    .single();
+
+                if (data) {
+                    const age = data.fecha_nacimiento ? Math.floor((new Date() - new Date(data.fecha_nacimiento)) / 31557600000) : '-';
+                    container.innerHTML = `
+                        <div><strong>Nombre:</strong> ${data.nombre} ${data.apellido || ''}</div>
+                        <div><strong>Email:</strong> ${data.email}</div>
+                        <div><strong>Teléfono:</strong> ${data.telefono || '-'}</div>
+                        <div><strong>Edad:</strong> ${age} años</div>
+                        <div><strong>Nivel:</strong> ${data.nivel}</div>
+                    `;
+                    if (conditionsContainer) {
+                         conditionsContainer.innerHTML = '<div>• Ninguna condición médica registrada en sistema.</div>';
+                    }
+                } else {
+                    container.innerHTML = '<em>No se encontró el expediente del paciente. Actualiza desde tu perfil.</em>';
+                    if (conditionsContainer) conditionsContainer.innerHTML = '';
                 }
             }
 
@@ -1282,6 +1342,58 @@
             }
 
             // ==================== ACTIONS ====================
+            async function handleRegister(e) {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.textContent;
+                btn.textContent = 'Creando cuenta...';
+                btn.disabled = true;
+
+                const nombre = document.getElementById('regNombre').value;
+                const apellido = document.getElementById('regApellido').value;
+                const email = document.getElementById('regEmail').value;
+                const telefono = document.getElementById('regTelefono').value;
+                const password = document.getElementById('regPassword').value;
+
+                // 1. Crear usuario en Auth
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                    email,
+                    password
+                });
+
+                if (authError) {
+                    alert(`Error al registrar: ${authError.message}`);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // 2. Crear perfil en tabla pacientes
+                if (authData.user) {
+                    const { error: dbError } = await supabaseClient.from('pacientes').insert({
+                        auth_uid: authData.user.id,
+                        nombre,
+                        apellido,
+                        email,
+                        telefono
+                    });
+
+                    if (dbError) {
+                        console.error('Error insertando perfil:', dbError.message);
+                    }
+                }
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+                
+                alert('¡Cuenta creada con éxito!');
+                if (authData.session) {
+                    showSection('dashboardPacienteSection');
+                } else {
+                    showSection('loginSection');
+                }
+            }
+
             async function handleNewAppointment(e) {
                 e.preventDefault();
                 const btn = e.target.querySelector("button");
