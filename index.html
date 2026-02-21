@@ -1215,7 +1215,7 @@
                     data: metricsData,
                     error: metricsError,
                 } = await supabaseClient.functions.invoke(
-                    "health-metrics",
+                    "health-metrics/metrics",
                     { method: "GET" },
                 );
                 const metricsContainer = document
@@ -1267,7 +1267,7 @@
 
                 // 2. Cargar Próxima Cita
                 const { data: appData } = await supabaseClient
-                    .functions.invoke("gamification-service");
+                    .functions.invoke("gamification-service/appointments");
                 const appts = appData || [];
                 const upcoming = appts.find((a) =>
                     a.estado === "pendiente" ||
@@ -1296,7 +1296,7 @@
 
                 // 3. Cargar Logros
                 const { data: achData } = await supabaseClient
-                    .functions.invoke("patient-service");
+                    .functions.invoke("patient-service/achievements");
                 const achContainer = document.getElementById(
                     "achievementsContainer",
                 );
@@ -1323,7 +1323,7 @@
                 );
                 list.innerHTML = "<em>Cargando...</em>";
                 const { data, error } = await supabaseClient
-                    .functions.invoke("gamification-service");
+                    .functions.invoke("gamification-service/appointments");
 
                 if (data && data.length > 0) {
                     list.innerHTML = data.map((c) => `
@@ -1434,7 +1434,7 @@
                 };
 
                 const { error } = await supabaseClient.functions
-                    .invoke("gamification-service", {
+                    .invoke("gamification-service/appointments", {
                         method: "POST",
                         body: data,
                     });
@@ -1465,7 +1465,7 @@
                 ) return;
 
                 const { error } = await supabaseClient.functions
-                    .invoke("gamification-service", {
+                    .invoke(`gamification-service/appointments/${id}`, {
                         method: "DELETE",
                         body: { id },
                     });
