@@ -823,19 +823,8 @@
                 >
                     ×
                 </button>
-                <div style="font-size: 14px; line-height: 1.8">
-                    <div><strong>Médico:</strong> Dr. García López</div>
-                    <div><strong>Especialidad:</strong> Cardiología</div>
-                    <div><strong>Fecha:</strong> 2026-02-21</div>
-                    <div><strong>Hora:</strong> 10:00 AM</div>
-                    <div><strong>Consultorio:</strong> 301</div>
-                    <div style="margin-top: 20px">
-                        <strong>Recordatorios:</strong>
-                        <div style="margin-top: 8px; color: var(--text-light)">
-                            ✓ Email enviado<br>
-                            ✓ SMS enviado
-                        </div>
-                    </div>
+                <div id="appointmentModalContent" style="font-size: 14px; line-height: 1.8">
+                    <em>Cargando detalles de la cita...</em>
                 </div>
                 <div class="btn-group" style="margin-top: 24px">
                     <button
@@ -847,6 +836,7 @@
                     <button
                         class="btn btn-secondary"
                         onclick="cancelAppointment()"
+                        id="appointmentModalCancelBtn"
                     >
                         Cancelar Cita
                     </button>
@@ -924,39 +914,8 @@
                 >
                     ×
                 </button>
-                <div style="font-size: 14px">
-                    <div
-                        style="background: var(--primary-light); padding: 16px; border-radius: 8px; margin: 12px 0"
-                    >
-                        <div style="font-weight: 600; color: var(--primary)">
-                            🏃 Reto: 10km Caminados
-                        </div>
-                        <div
-                            style="margin-top: 8px; font-size: 12px; color: var(--text-light)"
-                        >
-                            Progreso: 5/10 km (50%)
-                        </div>
-                        <div
-                            style="margin-top: 8px; background: white; height: 8px; border-radius: 4px; overflow: hidden"
-                        >
-                            <div
-                                style="background: var(--primary); height: 100%; width: 50%"
-                            >
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        style="background: #d1fae5; padding: 16px; border-radius: 8px; margin: 12px 0"
-                    >
-                        <div style="font-weight: 600; color: var(--success)">
-                            ✓ Logro Desbloqueado: Semana Saludable
-                        </div>
-                        <div
-                            style="margin-top: 8px; font-size: 12px; color: var(--text-light)"
-                        >
-                            Completaste 5 días de ejercicio
-                        </div>
-                    </div>
+                <div id="achievementsModalContent" style="font-size: 14px">
+                    <em>Cargando detalles de logros y retos...</em>
                 </div>
             </div>
         </div>
@@ -1024,7 +983,55 @@
                 if (currentUser) loadSectionData(sectionId);
             }
 
+            // Estado en cache para modales
+            let cachedDashboardData = {
+                upcomingAppointment: null,
+                achievements: null
+            };
+
             function showModal(modalId) {
+                if (modalId === 'appointmentModal') {
+                    const content = document.getElementById('appointmentModalContent');
+                    const cancelBtn = document.getElementById('appointmentModalCancelBtn');
+                    if (cachedDashboardData.upcomingAppointment) {
+                        const app = cachedDashboardData.upcomingAppointment;
+                        const dateObj = new Date(app.fecha);
+                        content.innerHTML = `
+                            <div><strong>Especialidad:</strong> ${app.especialidad || '-'}</div>
+                            <div><strong>Motivo:</strong> ${app.motivo || '-'}</div>
+                            <div><strong>Fecha:</strong> ${dateObj.toLocaleDateString()}</div>
+                            <div><strong>Hora:</strong> ${dateObj.toLocaleTimeString()}</div>
+                            <div style="margin-top: 20px">
+                                <strong>Estado Actual:</strong>
+                                <div style="margin-top: 8px; color: var(--text-light)">
+                                    ${app.estado === 'confirmada' ? '✓ Cita Confirmada' : '⌛ Pendiente de confirmación'}
+                                </div>
+                            </div>
+                        `;
+                        cancelBtn.onclick = () => cancelAppointment(app.id);
+                        cancelBtn.style.display = 'block';
+                    } else {
+                        content.innerHTML = '<em>No hay citas próximas agendadas para mostrar.</em>';
+                        cancelBtn.style.display = 'none';
+                    }
+                } else if (modalId === 'achievementsModal') {
+                    const content = document.getElementById('achievementsModalContent');
+                    if (cachedDashboardData.achievements && cachedDashboardData.achievements.length > 0) {
+                        content.innerHTML = cachedDashboardData.achievements.map(a => `
+                            <div style="background: var(--primary-light); padding: 16px; border-radius: 8px; margin: 12px 0">
+                                <div style="font-weight: 600; color: var(--primary)">
+                                    🏅 Logro: ${a.nombre}
+                                </div>
+                                <div style="margin-top: 8px; font-size: 12px; color: var(--text-light)">
+                                    ${a.descripcion}
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        content.innerHTML = '<em>Aún no has desbloqueado logros ni completado retos.</em>';
+                    }
+                }
+                
                 document.getElementById(modalId).classList.add(
                     "active",
                 );
@@ -1270,6 +1277,8 @@
                     "nextAppointmentContainer",
                 );
 
+                cachedDashboardData.upcomingAppointment = upcoming || null;
+
                 if (upcoming) {
                     const dt = new Date(upcoming.fecha)
                         .toLocaleString();
@@ -1291,6 +1300,9 @@
                 const achContainer = document.getElementById(
                     "achievementsContainer",
                 );
+                
+                cachedDashboardData.achievements = achData?.logros || [];
+
                 if (
                     achData?.logros && achData.logros.length > 0
                 ) {
@@ -1442,6 +1454,10 @@
             }
 
             async function cancelAppointment(id) {
+                if(!id) {
+                    alert("No hay información de cita a cancelar");
+                    return;
+                }
                 if (
                     !confirm(
                         "¿Estás seguro de cancelar esta cita?",
@@ -1460,7 +1476,13 @@
                     return;
                 }
                 alert("Cita cancelada correctamente");
+                closeModal("appointmentModal");
+                
+                // Recargar las vistas de citas y dashboard
                 loadPatientAppointments();
+                if (document.getElementById('dashboardPacienteSection').classList.contains('active')) {
+                    loadPatientDashboard();
+                }
             }
 
             async function handleSaveMetrics(e) {
