@@ -703,23 +703,23 @@
                                 <div class="card-title mb-2">
                                     Pacientes Activos
                                 </div>
-                                <div class="card-value">24</div>
-                                <div class="card-subtitle">Este mes</div>
+                                <div class="card-value" id="adminActivePatients">-</div>
+                                <div class="card-subtitle">En el sistema</div>
                             </div>
                             <div class="card">
                                 <div class="card-title mb-2">
                                     Citas Programadas
                                 </div>
-                                <div class="card-value">18</div>
-                                <div class="card-subtitle">Próximas 7 días</div>
+                                <div class="card-value" id="adminScheduledAppointments">-</div>
+                                <div class="card-subtitle">Todas las citas pendientes</div>
                             </div>
                             <div class="card">
                                 <div class="card-title mb-2">
                                     Alertas Activas
                                 </div>
-                                <div class="card-value">5</div>
+                                <div class="card-value" id="adminActiveAlerts">-</div>
                                 <div class="card-subtitle">
-                                    Requieren atención
+                                    Métricas en estados críticos
                                 </div>
                             </div>
                         </div>
@@ -1182,7 +1182,34 @@
                     sectionId === "expedienteSection"
                 ) {
                     await loadPatientProfile();
+                } else if (
+                    sectionId === "dashboardAdminSection"
+                ) {
+                    await loadAdminDashboard();
                 }
+            }
+
+            async function loadAdminDashboard() {
+                // Fetch patients count
+                const { count: patientsCount } = await supabaseClient
+                    .from('pacientes')
+                    .select('*', { count: 'exact', head: true });
+                document.getElementById('adminActivePatients').textContent = patientsCount || 0;
+
+                // Fetch appointments count (only pending or confirmed)
+                const { count: appointmentsCount } = await supabaseClient
+                    .from('citas')
+                    .select('*', { count: 'exact', head: true })
+                    .in('estado', ['pendiente', 'confirmada']);
+                document.getElementById('adminScheduledAppointments').textContent = appointmentsCount || 0;
+
+                // Fetch alerts (metrics with alerts)
+                // For simplicity, we count metrics that have an array of "alertas" that is not empty
+                const { data: metricsData, error } = await supabaseClient
+                    .from('metricas')
+                    .select('alertas');
+                const alertsCount = metricsData ? metricsData.filter(m => m.alertas && m.alertas.length > 0).length : 0;
+                document.getElementById('adminActiveAlerts').textContent = alertsCount;
             }
 
             async function loadPatientProfile() {
