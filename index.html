@@ -1186,6 +1186,14 @@
                     sectionId === "dashboardAdminSection"
                 ) {
                     await loadAdminDashboard();
+                } else if (
+                    sectionId === "gestionPacientesSection"
+                ) {
+                    await loadPatientsList();
+                } else if (
+                    sectionId === "gestionCitasSection"
+                ) {
+                    await loadAppointmentsAdmin();
                 }
             }
 
@@ -1210,6 +1218,64 @@
                     .select('alertas');
                 const alertsCount = metricsData ? metricsData.filter(m => m.alertas && m.alertas.length > 0).length : 0;
                 document.getElementById('adminActiveAlerts').textContent = alertsCount;
+            }
+
+            async function loadPatientsList() {
+                const list = document.getElementById("patientsList");
+                list.innerHTML = "<em>Cargando pacientes...</em>";
+                
+                const { data, error } = await supabaseClient
+                    .from("pacientes")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (data && data.length > 0) {
+                    list.innerHTML = data.map(p => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <h3>${p.nombre} ${p.apellido || ''}</h3>
+                                <p>${p.email} | Nivel: ${p.nivel}</p>
+                            </div>
+                            <div class="list-item-actions">
+                                <button class="btn btn-secondary btn-small" onclick="alert('Funcionalidad en desarrollo')">Ver Perfil</button>
+                            </div>
+                        </div>
+                    `).join("");
+                } else {
+                    list.innerHTML = "<em>No hay pacientes registrados en el sistema.</em>";
+                }
+            }
+
+            async function loadAppointmentsAdmin() {
+                const list = document.getElementById("appointmentsAdminList");
+                list.innerHTML = "<em>Cargando citas...</em>";
+
+                const { data, error } = await supabaseClient
+                    .from("citas")
+                    .select("*, pacientes(nombre, apellido)")
+                    .order("fecha", { ascending: true });
+
+                if (data && data.length > 0) {
+                    list.innerHTML = data.map(c => `
+                        <div class="list-item">
+                            <div class="list-item-info">
+                                <h3>
+                                    Cita de ${c.pacientes ? c.pacientes.nombre + ' ' + (c.pacientes.apellido || '') : 'Paciente Desconocido'} 
+                                    - ${c.especialidad || 'Consulta'}
+                                    <span class="badge ${
+                                        c.estado === "confirmada" ? "badge-success" : (c.estado === "cancelada" ? "badge-danger" : "badge-warning")
+                                    }">${c.estado}</span>
+                                </h3>
+                                <p>${new Date(c.fecha).toLocaleString()} | Motivo: ${c.motivo}</p>
+                            </div>
+                            <div class="list-item-actions">
+                                <button class="btn btn-secondary btn-small" onclick="alert('Funcionalidad en desarrollo')">Detalles</button>
+                            </div>
+                        </div>
+                    `).join("");
+                } else {
+                    list.innerHTML = "<em>No hay citas registradas en el sistema.</em>";
+                }
             }
 
             async function loadPatientProfile() {
