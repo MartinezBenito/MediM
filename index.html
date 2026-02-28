@@ -1170,32 +1170,68 @@
                 
                 <!-- Active Challenges -->
                 <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--text-main);">En Progreso</h3>
+                
                 <div class="challenge-item">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <strong>💧 Hidratación Perfecta</strong>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div>
+                            <strong style="display: block;">💧 Hidratación Perfecta</strong>
+                            <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Registra 2 litros de agua por 7 días seguidos.</div>
+                        </div>
                         <span style="font-size: 12px; font-weight: 600; color: var(--primary);">4/7 Días</span>
                     </div>
-                    <div style="font-size: 13px; color: var(--text-dim);">Registra 2 litros de agua por 7 días seguidos.</div>
                     <div class="progress-container"><div class="progress-bar" style="width: 57%;"></div></div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-small" onclick="document.getElementById('fileUpload-agua').click()">Verificar Evidencia</button>
+                        <input type="file" id="fileUpload-agua" accept="video/*,image/*" style="display: none;" onchange="submitEvidence('Hidratación Perfecta', this)">
+                    </div>
                 </div>
                 
                 <div class="challenge-item" style="border-left-color: var(--success);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <strong>🏃‍♂️ Pasos Diarios</strong>
-                        <span style="font-size: 12px; font-weight: 600; color: var(--success);">8,500/10,000</span>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div>
+                            <strong style="display: block;">🧘‍♂️ Postura y Estiramiento</strong>
+                            <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Realiza 15 minutos de yoga o estiramiento. Sube un video corto realizándolo.</div>
+                        </div>
+                        <span style="font-size: 12px; font-weight: 600; color: var(--success);">Pendiente Diaria</span>
                     </div>
-                    <div style="font-size: 13px; color: var(--text-dim);">Camina 10,000 pasos en un solo día.</div>
-                    <div class="progress-container"><div class="progress-bar" style="width: 85%; background-color: var(--success);"></div></div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 30%; background-color: var(--success);"></div></div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-small" style="background-color: var(--success);" onclick="document.getElementById('fileUpload-yoga').click()">📹 Subir Video Evidencia</button>
+                        <input type="file" id="fileUpload-yoga" accept="video/*" style="display: none;" onchange="submitEvidence('Postura y Estiramiento', this)">
+                    </div>
                 </div>
 
                 <!-- Available Challenges -->
-                <h3 style="margin-top: 32px; margin-bottom: 12px; font-size: 16px; color: var(--text-main);">Disponibles</h3>
-                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div>
-                        <strong style="display: block; margin-bottom: 4px;">🍎 Semana Sin Azúcar</strong>
-                        <div style="font-size: 13px; color: var(--text-dim);">Evita azúcares refinados por 5 días.</div>
+                <h3 style="margin-top: 32px; margin-bottom: 12px; font-size: 16px; color: var(--text-main);">Disponibles para ti</h3>
+                
+                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <strong style="display: block; margin-bottom: 4px;">🥗 Plato Arcoíris</strong>
+                            <div style="font-size: 13px; color: var(--text-dim);">Come 5 porciones de verduras/frutas de distinto color. (Evidencia: Foto del platillo).</div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="alert('Reto Nutricional aceptado. ¡Sube tu foto en tu próxima comida!')">Aceptar</button>
                     </div>
-                    <button class="btn btn-primary btn-small" onclick="alert('Reto aceptado. ¡Mucho éxito!')">Aceptar</button>
+                </div>
+
+                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <strong style="display: block; margin-bottom: 4px;">💪 Fuerza Core</strong>
+                            <div style="font-size: 13px; color: var(--text-dim);">Mantén una plancha (plank) por 60 segundos. (Evidencia: Video sin cortes).</div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="alert('Reto Físico aceptado. ¡Prepara tu cámara!')">Aceptar</button>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <strong style="display: block; margin-bottom: 4px;">🧠 Desconexión Digital</strong>
+                            <div style="font-size: 13px; color: var(--text-dim);">0 pantallas 1 hora antes de dormir por 3 días. (Evidencia: Registro confirmatorio).</div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="alert('Reto Hábitos aceptado.')">Aceptar</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1957,6 +1993,16 @@
                 } else {
                     localStorage.setItem('luxhealth_theme', 'light');
                     toggleBtn.textContent = '🌙';
+                }
+            }
+
+            // ==================== GAMIFICACIÓN Y EVIDENCIAS ====================
+            function submitEvidence(challengeName, inputElement) {
+                if (inputElement.files && inputElement.files[0]) {
+                    const file = inputElement.files[0];
+                    const isVideo = file.type.startsWith('video/');
+                    alert(`¡Evidencia (${isVideo ? 'Video' : 'Imagen'}) para "${challengeName}" subida con éxito!\n\nArchivo: ${file.name}\n\nUn administrador o la IA validará tu evidencia pronto para otorgarte los puntos.`);
+                    // Lógica futura: Subir 'file' a Supabase Storage y registrar en base de datos.
                 }
             }
 
