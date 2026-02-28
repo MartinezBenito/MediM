@@ -577,6 +577,29 @@
                 .content { padding: 24px; }
                 .header { padding: 20px 24px; }
             }
+            /* Custom Progress Bar for Challenges */
+            .progress-container {
+                width: 100%;
+                background-color: var(--border);
+                border-radius: var(--radius-sm);
+                overflow: hidden;
+                margin-top: 8px;
+                height: 8px;
+            }
+            .progress-bar {
+                height: 100%;
+                background-color: var(--primary);
+                border-radius: var(--radius-sm);
+                transition: width 0.5s ease;
+            }
+            .challenge-item {
+                border-left: 3px solid var(--primary);
+                padding-left: 12px;
+                margin-bottom: 16px;
+                background: rgba(14, 165, 233, 0.03);
+                border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+                padding: 12px;
+            }
         </style>
     </head>
     <body>
@@ -752,24 +775,25 @@
                             <div class="card">
                                 <div class="card-header">
                                     <div>
-                                        <div class="card-title">Mis Logros</div>
+                                        <div class="card-title">Retos de Salud</div>
                                         <div class="card-subtitle">
-                                            Progreso semanal
+                                            Gana puntos y medallas
                                         </div>
                                     </div>
+                                    <div style="font-size: 24px;">🏆</div>
                                 </div>
                                 <div
                                     id="achievementsContainer"
-                                    style="font-size: 14px"
+                                    style="font-size: 14px; margin-top: 12px;"
                                 >
-                                    <em>Cargando logros...</em>
+                                    <em>Cargando retos...</em>
                                 </div>
                                 <button
                                     class="btn btn-secondary btn-small"
-                                    onclick="showModal('achievementsModal')"
+                                    onclick="showModal('challengesModal')"
                                     style="margin-top: 16px; width: 100%"
                                 >
-                                    Ver Todos
+                                    Ver Todos los Retos
                                 </button>
                             </div>
 
@@ -1132,6 +1156,47 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Modals for Features -->
+        <div class="modal" id="challengesModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal('challengesModal')">×</button>
+                <h2 class="modal-header">🏆 Mis Retos de Salud</h2>
+                <div style="margin-bottom: 24px; color: var(--text-dim); font-size: 14px;">
+                    Completa estos retos para mejorar tu salud y ganar insignias especiales en tu expediente.
+                </div>
+                
+                <!-- Active Challenges -->
+                <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--text-main);">En Progreso</h3>
+                <div class="challenge-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong>💧 Hidratación Perfecta</strong>
+                        <span style="font-size: 12px; font-weight: 600; color: var(--primary);">4/7 Días</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-dim);">Registra 2 litros de agua por 7 días seguidos.</div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 57%;"></div></div>
+                </div>
+                
+                <div class="challenge-item" style="border-left-color: var(--success);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <strong>🏃‍♂️ Pasos Diarios</strong>
+                        <span style="font-size: 12px; font-weight: 600; color: var(--success);">8,500/10,000</span>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-dim);">Camina 10,000 pasos en un solo día.</div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 85%; background-color: var(--success);"></div></div>
+                </div>
+
+                <!-- Available Challenges -->
+                <h3 style="margin-top: 32px; margin-bottom: 12px; font-size: 16px; color: var(--text-main);">Disponibles</h3>
+                <div style="border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                        <strong style="display: block; margin-bottom: 4px;">🍎 Semana Sin Azúcar</strong>
+                        <div style="font-size: 13px; color: var(--text-dim);">Evita azúcares refinados por 5 días.</div>
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="alert('Reto aceptado. ¡Mucho éxito!')">Aceptar</button>
+                </div>
             </div>
         </div>
 
@@ -1591,27 +1656,28 @@
                         "<em>No tienes citas próximas agendadas.</em>";
                 }
 
-                // 3. Cargar Logros
-                const { data: achData } = await supabaseClient
-                    .functions.invoke("patient-service/achievements");
+                // 3. Cargar Retos y Logros
                 const achContainer = document.getElementById(
                     "achievementsContainer",
                 );
                 
-                cachedDashboardData.achievements = achData?.logros || [];
-
-                if (
-                    achData?.logros && achData.logros.length > 0
-                ) {
-                    achContainer.innerHTML = achData.logros.map(
-                        (l) => `
-                    <div style="margin: 12px 0;">🏅 <strong>${l.nombre}</strong><br><small>${l.descripcion}</small></div>
-                `
-                    ).join("");
-                } else {
-                    achContainer.innerHTML =
-                        "<em>Aún no hay logros. ¡Explora los retos para ganar medallas!</em>";
-                }
+                // Emulate dynamic gamification loading
+                achContainer.innerHTML = `
+                    <div class="challenge-item" style="padding: 8px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <strong style="font-size: 13px;">💧 Hidratación Perfecta</strong>
+                            <span style="font-size: 11px; color: var(--primary); font-weight: bold;">57%</span>
+                        </div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 57%;"></div></div>
+                    </div>
+                    <div class="challenge-item" style="padding: 8px; margin-bottom: 0; border-left-color: var(--success);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                            <strong style="font-size: 13px;">🏃 Pasos Diarios</strong>
+                            <span style="font-size: 11px; color: var(--success); font-weight: bold;">85%</span>
+                        </div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 85%; background-color: var(--success);"></div></div>
+                    </div>
+                `;
             }
 
             async function loadPatientAppointments() {
