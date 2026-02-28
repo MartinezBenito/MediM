@@ -614,16 +614,6 @@
                 <div class="logo">
                     <img src="https://carrerasenlinea.top/wp-content/uploads/2023/06/image-58.png" alt="Universidad Lux" class="logo-img" style="height: 48px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 24px;" />
                 </div>
-                <!-- Links (Visibles para todos) -->
-                <a
-                    href="#"
-                    class="nav-link active"
-                    onclick="showSection('dashboard')"
-                    id="nav-dashboard"
-                >
-                    <span class="icon">📊</span>
-                    <span>Datos</span>
-                </a>
                 <ul class="nav-menu" id="navMenu"></ul>
             </aside>
 
@@ -1329,22 +1319,26 @@
             }
 
             function updateUI() {
-                const navMenu = document.getElementById(
-                    "navMenu",
-                );
-                const userMenu = document.getElementById(
-                    "userMenu",
-                );
+                const navMenu = document.getElementById("navMenu");
+                const userMenu = document.getElementById("userMenu");
+                const appContainer = document.querySelector(".app");
+                const sidebar = document.querySelector(".sidebar");
+                const sidebarToggle = document.getElementById("sidebarToggle");
+
                 navMenu.innerHTML = "";
 
                 if (!currentUser) {
-                    navMenu.innerHTML =
-                        '<li class="nav-item"><button class="nav-link active" onclick="showSection(\'loginSection\')">🔑 Iniciar Sesión</button></li>';
                     userMenu.style.display = "none";
+                    if (sidebar) sidebar.style.display = "none";
+                    if (sidebarToggle) sidebarToggle.style.display = "none";
+                    if (appContainer) appContainer.style.gridTemplateColumns = "1fr";
                     return;
                 }
 
                 userMenu.style.display = "flex";
+                if (sidebar) sidebar.style.display = "flex";
+                if (sidebarToggle) sidebarToggle.style.display = "flex";
+                if (appContainer) appContainer.style.gridTemplateColumns = "";
 
                 document.getElementById("userName")
                     .textContent = currentUser.email;
