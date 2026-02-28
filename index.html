@@ -36,7 +36,25 @@
                 
                 --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
                 --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
                 --transition: all 0.2s ease;
+            }
+
+            .dark-theme {
+                --bg-main: #0f172a; /* Slate 900 */
+                --bg-card: #1e293b; /* Slate 800 */
+                --bg-sidebar: #1e293b; /* Slate 800 */
+                
+                --text-main: #f8fafc; /* Slate 50 */
+                --text-dim: #cbd5e1; /* Slate 300 */
+                --text-mute: #64748b; /* Slate 500 */
+                
+                --border: #334155; /* Slate 700 */
+                --border-hover: #475569; /* Slate 600 */
+                
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+                --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
             }
 
             * {
@@ -191,6 +209,27 @@
                 color: var(--danger);
                 border-color: var(--danger);
                 background: rgba(239, 68, 68, 0.05);
+            }
+
+            .btn-theme-toggle {
+                background: var(--bg-main);
+                border: 1px solid var(--border);
+                color: var(--text-main);
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: var(--transition);
+                font-size: 18px;
+            }
+
+            .btn-theme-toggle:hover {
+                background: var(--bg-card);
+                border-color: var(--primary);
+                transform: scale(1.05);
             }
 
             /* Content Area */
@@ -493,6 +532,9 @@
                 <header class="header">
                     <h1 class="header-title" id="pageTitle">Dashboard</h1>
                     <div class="user-menu" id="userMenu">
+                        <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
+                            🌙
+                        </button>
                         <span
                             id="userName"
                             style="font-size: 14px; color: var(--text-light)"
@@ -1707,9 +1749,32 @@
                         },
                     );
 
+                    // Inicializar Tema Claro / Oscuro
+                    const savedTheme = localStorage.getItem('luxhealth_theme');
+                    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                        document.body.classList.add('dark-theme');
+                        document.getElementById('themeToggle').textContent = '☀️';
+                    }
+
                     updateUI();
                 },
             );
+
+            // ==================== TEMA (LIGHT/DARK) ====================
+            function toggleTheme() {
+                const body = document.body;
+                const toggleBtn = document.getElementById('themeToggle');
+                
+                body.classList.toggle('dark-theme');
+                
+                if (body.classList.contains('dark-theme')) {
+                    localStorage.setItem('luxhealth_theme', 'dark');
+                    toggleBtn.textContent = '☀️';
+                } else {
+                    localStorage.setItem('luxhealth_theme', 'light');
+                    toggleBtn.textContent = '🌙';
+                }
+            }
         </script>
     </body>
 </html>
