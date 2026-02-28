@@ -79,9 +79,13 @@
                 display: grid;
                 grid-template-columns: 280px 1fr;
                 min-height: 100vh;
+                transition: grid-template-columns 0.3s ease;
             }
 
-            /* Sidebar */
+            .app.collapsed-mode {
+                grid-template-columns: 80px 1fr;
+            }
+
             .sidebar {
                 background: var(--bg-sidebar);
                 border-right: 1px solid var(--border);
@@ -92,6 +96,13 @@
                 display: flex;
                 flex-direction: column;
                 z-index: 50;
+                transition: all 0.3s ease;
+                overflow-x: hidden;
+            }
+
+            .app.collapsed-mode .sidebar {
+                padding: 40px 16px;
+                align-items: center;
             }
 
             .logo {
@@ -103,6 +114,23 @@
                 align-items: center;
                 gap: 12px;
                 letter-spacing: -1px;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .app.collapsed-mode .logo span:last-child {
+                display: none;
+            }
+
+            .logo-img {
+                height: 40px;
+                width: auto;
+                object-fit: contain;
+                transition: transform 0.3s ease;
+            }
+            
+            .app.collapsed-mode .logo-img {
+                height: 32px;
             }
 
             .nav-menu {
@@ -130,6 +158,16 @@
                 font-weight: 500;
                 width: 100%;
                 text-align: left;
+                white-space: nowrap;
+            }
+
+            .app.collapsed-mode .nav-link {
+                padding: 14px;
+                justify-content: center;
+            }
+
+            .app.collapsed-mode .nav-link span:last-child {
+                display: none;
             }
 
             .nav-link:hover {
@@ -163,6 +201,32 @@
                 position: sticky;
                 top: 0;
                 z-index: 40;
+            }
+
+            .header-title-container {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .btn-collapse {
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text-dim);
+                width: 38px;
+                height: 38px;
+                border-radius: var(--radius-sm);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: var(--transition);
+                font-size: 18px;
+            }
+
+            .btn-collapse:hover {
+                background: var(--bg-main);
+                color: var(--primary);
             }
 
             .header-title {
@@ -520,7 +584,8 @@
             <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="logo">
-                    <span style="font-size: 32px">💊</span>
+                    <img src="https://universidadlux.edu.mx/wp-content/uploads/2023/10/LOGO-LUX-1-05.png" alt="Universidad Lux" class="logo-img" onerror="this.onerror=null; this.src='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png'; if(this.src==='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png') {this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='inline';}};" />
+                    <span style="display:none; font-size: 32px;">🎓</span>
                     <span>LuxHealth</span>
                 </div>
                 <ul class="nav-menu" id="navMenu"></ul>
@@ -530,7 +595,12 @@
             <div class="main">
                 <!-- Header -->
                 <header class="header">
-                    <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                    <div class="header-title-container">
+                        <button class="btn-collapse" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar menú">
+                            ☰
+                        </button>
+                        <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                    </div>
                     <div class="user-menu" id="userMenu">
                         <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
                             🌙
@@ -1775,6 +1845,26 @@
                     toggleBtn.textContent = '🌙';
                 }
             }
+
+            // ==================== SIDEBAR COLLAPSE ====================
+            function toggleSidebar() {
+                const appContent = document.querySelector('.app');
+                appContent.classList.toggle('collapsed-mode');
+                
+                if (appContent.classList.contains('collapsed-mode')) {
+                    localStorage.setItem('luxhealth_sidebar', 'collapsed');
+                } else {
+                    localStorage.setItem('luxhealth_sidebar', 'expanded');
+                }
+            }
+
+            // Init Sidebar State
+            document.addEventListener("DOMContentLoaded", () => {
+                const savedSidebar = localStorage.getItem('luxhealth_sidebar');
+                if (savedSidebar === 'collapsed') {
+                    document.querySelector('.app').classList.add('collapsed-mode');
+                }
+            });
         </script>
     </body>
 </html>
