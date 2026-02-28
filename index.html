@@ -599,7 +599,7 @@
                         <button class="btn-collapse" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar menú">
                             ☰
                         </button>
-                        <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                        <h1 class="header-title" id="pageTitle">Datos</h1>
                     </div>
                     <div class="user-menu" id="userMenu">
                         <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
@@ -826,7 +826,33 @@
                             </div>
                             <div class="card">
                                 <div class="card-title mb-2">
-                                    Condiciones Médicas
+                                    Historial de Enfermedades
+                                </div>
+                                <div id="patientHistoryContainer" style="font-size: 14px; line-height: 1.8">
+                                    <em>Cargando historial...</em>
+                                </div>
+                                <button
+                                    class="btn btn-secondary btn-small"
+                                    onclick="alert('Funcionalidad para añadir historial en desarrollo.')"
+                                    style="margin-top: 16px; width: 100%"
+                                >
+                                    Añadir Registro
+                                </button>
+                            </div>
+                            <div class="card" style="border-color: var(--primary);">
+                                <div class="card-title mb-2" style="color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                                    <span>🤖</span> Probables Enfermedades Futuras
+                                </div>
+                                <div class="card-subtitle" style="margin-bottom: 12px;">
+                                    Análisis predictivo basado en el perfil e historial.
+                                </div>
+                                <div id="patientPredictionsContainer" style="font-size: 14px; line-height: 1.8;">
+                                    <em>Generando predicciones...</em>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-title mb-2">
+                                    Condiciones Médicas Activas
                                 </div>
                                 <div id="patientConditionsContainer" style="font-size: 14px; line-height: 1.8">
                                     <em>Cargando condiciones...</em>
@@ -1430,6 +1456,8 @@
 
             async function loadPatientProfile() {
                 const container = document.getElementById("patientProfileContainer");
+                const historyContainer = document.getElementById("patientHistoryContainer");
+                const predictionsContainer = document.getElementById("patientPredictionsContainer");
                 const conditionsContainer = document.getElementById("patientConditionsContainer");
                 
                 if (!container) return;
@@ -1449,11 +1477,31 @@
                         <div><strong>Edad:</strong> ${age} años</div>
                         <div><strong>Nivel:</strong> ${data.nivel}</div>
                     `;
+                    
+                    if (historyContainer) {
+                        historyContainer.innerHTML = `
+                            <ul style="padding-left: 20px; color: var(--text-dim);">
+                                <li><em>Sin antecedentes registrados. Sistema listo para recolección de datos.</em></li>
+                            </ul>
+                        `;
+                    }
+                    
+                    if (predictionsContainer) {
+                        predictionsContainer.innerHTML = `
+                            <div style="background: rgba(14, 165, 233, 0.05); border: 1px dashed var(--primary); padding: 16px; border-radius: var(--radius-sm);">
+                                <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Sistema de Prevención Activo</strong>
+                                <p style="color: var(--text-dim); margin-bottom: 0;">Actualmente no hay suficientes datos históricos para generar predicciones precisas. A medida que se agregue tu historial médico (ej. antecedentes familiares, alergias, enfermedades previas) el algoritmo calculará tus riesgos potenciales.</p>
+                            </div>
+                        `;
+                    }
+
                     if (conditionsContainer) {
                          conditionsContainer.innerHTML = '<div>• Ninguna condición médica registrada en sistema.</div>';
                     }
                 } else {
                     container.innerHTML = '<em>No se encontró el expediente del paciente. Actualiza desde tu perfil.</em>';
+                    if (historyContainer) historyContainer.innerHTML = '';
+                    if (predictionsContainer) predictionsContainer.innerHTML = '';
                     if (conditionsContainer) conditionsContainer.innerHTML = '';
                 }
             }
