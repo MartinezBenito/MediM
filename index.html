@@ -483,13 +483,17 @@
             .modal-content {
                 background: var(--bg-card);
                 border: 1px solid var(--border);
-                border-radius: var(--radius-lg);
                 padding: 32px;
-                max-width: 500px;
+                border-radius: var(--radius-lg);
                 width: 90%;
-                box-shadow: var(--shadow-lg);
-                transform: scale(0.95);
-                transition: var(--transition);
+                max-width: 500px;
+                position: relative;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                transform: translateY(20px);
+                transition: transform 0.3s ease-out;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .modal.active .modal-content {
@@ -591,6 +595,7 @@
                 background-color: var(--primary);
                 border-radius: var(--radius-sm);
                 transition: width 0.5s ease;
+                width: 0%; /* Reset to 0% for new challenges */
             }
             .challenge-item {
                 border-left: 3px solid var(--primary);
@@ -605,138 +610,25 @@
     <body>
         <div class="app">
             <!-- Sidebar -->
-            <aside class="sidebar">
+            <nav class="sidebar">
                 <div class="logo">
-                    <img src="https://universidadlux.edu.mx/wp-content/uploads/2023/10/LOGO-LUX-1-05.png" alt="Universidad Lux" class="logo-img" onerror="this.onerror=null; this.src='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png'; if(this.src==='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png') {this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='inline';}};" />
-                    <span style="display:none; font-size: 32px;">🎓</span>
-                    <span>LuxHealth</span>
+                    <img src="https://carrerasenlinea.top/wp-content/uploads/2023/06/image-58.png" alt="Universidad Lux" style="height: 48px; width: auto; max-width: 100%; object-fit: contain;">
                 </div>
-                <ul class="nav-menu" id="navMenu"></ul>
-            </aside>
-
-            <!-- Main -->
-            <div class="main">
-                <!-- Header -->
-                <header class="header">
-                    <div class="header-title-container">
-                        <button class="btn-collapse" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar menú">
-                            ☰
-                        </button>
-                        <h1 class="header-title" id="pageTitle">Datos</h1>
-                    </div>
-                    <div class="user-menu" id="userMenu">
-                        <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
-                            🌙
-                        </button>
-                        <span
-                            id="userName"
-                            style="font-size: 14px; color: var(--text-light)"
-                        >Usuario</span>
-                        <div class="user-avatar" id="userAvatar">U</div>
-                        <button class="btn-logout" onclick="logout()">
-                            Salir
-                        </button>
-                    </div>
-                </header>
-
-                <!-- Content -->
-                <main class="content">
-                    <!-- Section: Login -->
-                    <section id="loginSection" class="section active">
-                        <div
-                            class="card"
-                            style="max-width: 400px; margin: 60px auto"
-                        >
-                            <h2 class="card-title mb-2">Iniciar Sesión</h2>
-                            <form onsubmit="handleLogin(event)">
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input
-                                        type="email"
-                                        id="loginEmail"
-                                        required
-                                    >
-                                </div>
-                                <div class="form-group">
-                                    <label>Contraseña</label>
-                                    <input
-                                        type="password"
-                                        id="loginPassword"
-                                        required
-                                    >
-                                </div>
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                    style="width: 100%"
-                                >
-                                    🚀 Entrar al Portal
-                                </button>
-                            </form>
-                            <div
-                                class="alert alert-success"
-                                style="margin-top: 16px; font-size: 12px"
-                            >
-                                <strong>Nota:</strong> Inicia sesión o crea una cuenta nueva.
-                            </div>
-                            <div style="text-align:center; margin-top: 24px;">
-                                <button type="button" class="btn btn-secondary" onclick="showSection('registerSection')" style="width: 100%;">✨ Crear una cuenta nueva</button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Section: Registro -->
-                    <section id="registerSection" class="section">
-                        <div class="card" style="max-width: 400px; margin: 60px auto;">
-                            <h2 class="card-title mb-2">Crear Cuenta</h2>
-                            <form onsubmit="handleRegister(event)">
-                                <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" id="regNombre" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Apellido</label>
-                                    <input type="text" id="regApellido" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" id="regEmail" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Teléfono</label>
-                                    <input type="tel" id="regTelefono" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Contraseña</label>
-                                    <input type="password" id="regPassword" required minlength="6">
-                                </div>
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">✅ Registrarme Ahora</button>
-                            </form>
-                            <div style="text-align:center; margin-top: 16px;">
-                                <button type="button" class="btn btn-secondary" onclick="showSection('loginSection')" style="width: 100%;">Ya tengo cuenta, iniciar sesión</button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Section: Dashboard Paciente -->
-                    <section id="dashboardPacienteSection" class="section">
-                        <div class="grid">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">
-                                            Próxima Cita
-                                        </div>
-                                        <div class="card-subtitle">
-                                            En 3 días
-                                        </div>
-                                    </div>
-                                </div>
+                <!-- Links (Visibles para todos) -->
+                <a
+                    href="#"
+                    class="nav-link active"
+                    onclick="showSection('dashboard')"
+                    id="nav-dashboard"
+                >
+                    <span class="icon">📊</span>
+                    <span>Datos</span>
+                </a>
+                <a
                                 <div
                                     id="nextAppointmentContainer"
                                     style="font-size: 14px; color: var(--text-light); margin: 16px 0"
                                 >
-                                    <em>Cargando próxima cita...</em>
                                 </div>
                                 <button
                                     class="btn btn-secondary btn-small"
@@ -1177,9 +1069,9 @@
                             <strong style="display: block;">💧 Hidratación Perfecta</strong>
                             <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Registra 2 litros de agua por 7 días seguidos.</div>
                         </div>
-                        <span style="font-size: 12px; font-weight: 600; color: var(--primary);">4/7 Días</span>
+                        <span style="font-size: 12px; font-weight: 600; color: var(--primary);">0/7 Días</span>
                     </div>
-                    <div class="progress-container"><div class="progress-bar" style="width: 57%;"></div></div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 0%;"></div></div>
                     <div style="margin-top: 12px; display: flex; gap: 8px;">
                         <button class="btn btn-primary btn-small" onclick="document.getElementById('fileUpload-agua').click()">Verificar Evidencia</button>
                         <input type="file" id="fileUpload-agua" accept="video/*,image/*" style="display: none;" onchange="submitEvidence('Hidratación Perfecta', this)">
@@ -1194,7 +1086,7 @@
                         </div>
                         <span style="font-size: 12px; font-weight: 600; color: var(--success);">Pendiente Diaria</span>
                     </div>
-                    <div class="progress-container"><div class="progress-bar" style="width: 30%; background-color: var(--success);"></div></div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 0%; background-color: var(--success);"></div></div>
                     <div style="margin-top: 12px; display: flex; gap: 8px;">
                         <button class="btn btn-primary btn-small" style="background-color: var(--success);" onclick="document.getElementById('fileUpload-yoga').click()">📹 Subir Video Evidencia</button>
                         <input type="file" id="fileUpload-yoga" accept="video/*" style="display: none;" onchange="submitEvidence('Postura y Estiramiento', this)">
@@ -1702,16 +1594,16 @@
                     <div class="challenge-item" style="padding: 8px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <strong style="font-size: 13px;">💧 Hidratación Perfecta</strong>
-                            <span style="font-size: 11px; color: var(--primary); font-weight: bold;">57%</span>
+                            <span style="font-size: 11px; color: var(--primary); font-weight: bold;">0%</span>
                         </div>
-                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 57%;"></div></div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 0%;"></div></div>
                     </div>
                     <div class="challenge-item" style="padding: 8px; margin-bottom: 0; border-left-color: var(--success);">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <strong style="font-size: 13px;">🏃 Pasos Diarios</strong>
-                            <span style="font-size: 11px; color: var(--success); font-weight: bold;">85%</span>
+                            <span style="font-size: 11px; color: var(--success); font-weight: bold;">0%</span>
                         </div>
-                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 85%; background-color: var(--success);"></div></div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 0%; background-color: var(--success);"></div></div>
                     </div>
                 `;
             }
