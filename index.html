@@ -483,13 +483,17 @@
             .modal-content {
                 background: var(--bg-card);
                 border: 1px solid var(--border);
-                border-radius: var(--radius-lg);
                 padding: 32px;
-                max-width: 500px;
+                border-radius: var(--radius-lg);
                 width: 90%;
-                box-shadow: var(--shadow-lg);
-                transform: scale(0.95);
-                transition: var(--transition);
+                max-width: 500px;
+                position: relative;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                transform: translateY(20px);
+                transition: transform 0.3s ease-out;
+                max-height: 90vh;
+                overflow-y: auto;
             }
 
             .modal.active .modal-content {
@@ -591,6 +595,7 @@
                 background-color: var(--primary);
                 border-radius: var(--radius-sm);
                 transition: width 0.5s ease;
+                width: 0%; /* Reset a 0 para retos nuevos */
             }
             .challenge-item {
                 border-left: 3px solid var(--primary);
@@ -607,10 +612,18 @@
             <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="logo">
-                    <img src="https://universidadlux.edu.mx/wp-content/uploads/2023/10/LOGO-LUX-1-05.png" alt="Universidad Lux" class="logo-img" onerror="this.onerror=null; this.src='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png'; if(this.src==='https://universidadlux.edu.mx/wp-content/uploads/2021/08/logo-lux.png') {this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='inline';}};" />
-                    <span style="display:none; font-size: 32px;">🎓</span>
-                    <span>LuxHealth</span>
+                    <img src="https://carrerasenlinea.top/wp-content/uploads/2023/06/image-58.png" alt="Universidad Lux" class="logo-img" style="height: 48px; width: auto; max-width: 100%; object-fit: contain; margin-bottom: 24px;" />
                 </div>
+                <!-- Links (Visibles para todos) -->
+                <a
+                    href="#"
+                    class="nav-link active"
+                    onclick="showSection('dashboard')"
+                    id="nav-dashboard"
+                >
+                    <span class="icon">📊</span>
+                    <span>Datos</span>
+                </a>
                 <ul class="nav-menu" id="navMenu"></ul>
             </aside>
 
@@ -1177,9 +1190,9 @@
                             <strong style="display: block;">💧 Hidratación Perfecta</strong>
                             <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Registra 2 litros de agua por 7 días seguidos.</div>
                         </div>
-                        <span style="font-size: 12px; font-weight: 600; color: var(--primary);">4/7 Días</span>
+                        <span style="font-size: 12px; font-weight: 600; color: var(--primary);">0/7 Días</span>
                     </div>
-                    <div class="progress-container"><div class="progress-bar" style="width: 57%;"></div></div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 0%;"></div></div>
                     <div style="margin-top: 12px; display: flex; gap: 8px;">
                         <button class="btn btn-primary btn-small" onclick="document.getElementById('fileUpload-agua').click()">Verificar Evidencia</button>
                         <input type="file" id="fileUpload-agua" accept="video/*,image/*" style="display: none;" onchange="submitEvidence('Hidratación Perfecta', this)">
@@ -1194,7 +1207,7 @@
                         </div>
                         <span style="font-size: 12px; font-weight: 600; color: var(--success);">Pendiente Diaria</span>
                     </div>
-                    <div class="progress-container"><div class="progress-bar" style="width: 30%; background-color: var(--success);"></div></div>
+                    <div class="progress-container"><div class="progress-bar" style="width: 0%; background-color: var(--success);"></div></div>
                     <div style="margin-top: 12px; display: flex; gap: 8px;">
                         <button class="btn btn-primary btn-small" style="background-color: var(--success);" onclick="document.getElementById('fileUpload-yoga').click()">📹 Subir Video Evidencia</button>
                         <input type="file" id="fileUpload-yoga" accept="video/*" style="display: none;" onchange="submitEvidence('Postura y Estiramiento', this)">
@@ -1343,7 +1356,7 @@
                     const adminNav = [
                         {
                             id: "dashboardAdminSection",
-                            name: "📊 Dashboard",
+                            name: "📊 Datos",
                         },
                         {
                             id: "gestionPacientesSection",
@@ -1373,7 +1386,7 @@
                     const pacienteNav = [
                         {
                             id: "dashboardPacienteSection",
-                            name: "📊 Dashboard",
+                            name: "📊 Datos",
                         },
                         {
                             id: "citasPacienteSection",
@@ -1702,16 +1715,16 @@
                     <div class="challenge-item" style="padding: 8px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <strong style="font-size: 13px;">💧 Hidratación Perfecta</strong>
-                            <span style="font-size: 11px; color: var(--primary); font-weight: bold;">57%</span>
+                            <span style="font-size: 11px; color: var(--primary); font-weight: bold;">0%</span>
                         </div>
-                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 57%;"></div></div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 0%;"></div></div>
                     </div>
                     <div class="challenge-item" style="padding: 8px; margin-bottom: 0; border-left-color: var(--success);">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <strong style="font-size: 13px;">🏃 Pasos Diarios</strong>
-                            <span style="font-size: 11px; color: var(--success); font-weight: bold;">85%</span>
+                            <span style="font-size: 11px; color: var(--success); font-weight: bold;">0%</span>
                         </div>
-                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 85%; background-color: var(--success);"></div></div>
+                        <div class="progress-container" style="height: 6px;"><div class="progress-bar" style="width: 0%; background-color: var(--success);"></div></div>
                     </div>
                 `;
             }
