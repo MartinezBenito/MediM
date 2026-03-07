@@ -1596,7 +1596,8 @@
                 // Fetch patients count
                 const { count: patientsCount } = await supabaseClient
                     .from('pacientes')
-                    .select('*', { count: 'exact', head: true });
+                    .select('*', { count: 'exact', head: true })
+                    .neq('email', currentUser.email);
                 document.getElementById('adminActivePatients').textContent = patientsCount || 0;
 
                 // Fetch appointments count (only pending or confirmed)
