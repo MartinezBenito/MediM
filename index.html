@@ -625,20 +625,22 @@
                         <button class="btn-collapse" id="sidebarToggle" onclick="toggleSidebar()" title="Colapsar menú">
                             ☰
                         </button>
-                        <h1 class="header-title" id="pageTitle">Datos</h1>
+                        <h1 class="header-title" id="pageTitle">MediM</h1>
                     </div>
                     <div class="user-menu" id="userMenu">
                         <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Cambiar tema">
                             🌙
                         </button>
-                        <span
-                            id="userName"
-                            style="font-size: 14px; color: var(--text-light)"
-                        >Usuario</span>
-                        <div class="user-avatar" id="userAvatar">U</div>
-                        <button class="btn-logout" onclick="logout()">
-                            Salir
-                        </button>
+                        <div id="userSpecificControls" style="display: flex; align-items: center; gap: 20px;">
+                            <span
+                                id="userName"
+                                style="font-size: 14px; color: var(--text-light)"
+                            >Usuario</span>
+                            <div class="user-avatar" id="userAvatar">U</div>
+                            <button class="btn-logout" onclick="logout()">
+                                Salir
+                            </button>
+                        </div>
                     </div>
                 </header>
 
@@ -860,7 +862,7 @@
                                 </div>
                                 <button
                                     class="btn btn-secondary btn-small"
-                                    onclick="alert('Funcionalidad para añadir historial en desarrollo.')"
+                                    onclick="showModal('addHistoryModal')"
                                     style="margin-top: 16px; width: 100%"
                                 >
                                     Añadir Registro
@@ -921,6 +923,35 @@
                                     Métricas en estados críticos
                                 </div>
                             </div>
+                        </div>
+                    </section>
+
+                    <!-- Section: Pendientes Admin -->
+                    <section id="pendientesAdminSection" class="section">
+                        <h2 style="margin-bottom: 24px">Pendientes de hoy</h2>
+                        <div class="card">
+                            <ul class="list-unstyled" style="padding: 0; margin: 0;">
+                                <li style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" style="width: 18px; height: 18px;">
+                                    <span>Confirmar citas de la tarde (14:00 - 18:00)</span>
+                                </li>
+                                <li style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" style="width: 18px; height: 18px;">
+                                    <span>Revisar stock de insumos básicos (jeringas, alcohol)</span>
+                                </li>
+                                <li style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" style="width: 18px; height: 18px;">
+                                    <span>Notificar cambios de horario a pacientes del Dr. García</span>
+                                </li>
+                                <li style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" style="width: 18px; height: 18px;">
+                                    <span>Revisar alertas críticas en tablero de métricas</span>
+                                </li>
+                                <li style="padding: 16px; display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" style="width: 18px; height: 18px;">
+                                    <span>Actualizar expedientes pendientes de firma</span>
+                                </li>
+                            </ul>
                         </div>
                     </section>
 
@@ -1040,6 +1071,60 @@
                         Cancelar Cita
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal: Edit Conditions (Patient) -->
+        <div class="modal" id="editConditionsModal">
+            <div class="modal-content">
+                <h3 class="modal-header">Condiciones Médicas</h3>
+                <button
+                    class="modal-close"
+                    onclick="closeModal('editConditionsModal')"
+                >
+                    ×
+                </button>
+                <form>
+                    <p style="color: var(--text-dim); margin-bottom: 16px; font-size: 14px;">
+                        Actualiza tu estado actual. Esto ayudará a generar retos más adecuados.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox"> Asma
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox"> Diabetes Tipo 2
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox"> Hipertensión
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="alert('Datos actualizados'); closeModal('editConditionsModal');" style="width: 100%">
+                        Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Add History (Patient) -->
+        <div class="modal" id="addHistoryModal">
+            <div class="modal-content">
+                <h3 class="modal-header">Añadir Antecedente Médico</h3>
+                <button
+                    class="modal-close"
+                    onclick="closeModal('addHistoryModal')"
+                >
+                    ×
+                </button>
+                <form onsubmit="handleAddHistory(event)">
+                    <div class="form-group">
+                        <label>Condición o Enfermedad</label>
+                        <input type="text" id="historyCondition" required placeholder="Ej. Hipertensión">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%">
+                        Guardar Registro
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -1256,6 +1341,22 @@
                 );
                 document.getElementById(sectionId).classList
                     .add("active");
+                
+                // Update Page Title
+                const pageTitle = document.getElementById("pageTitle");
+                if (sectionId === "loginSection" || sectionId === "registroSection") {
+                    pageTitle.textContent = "MediM";
+                } else {
+                    // Find corresponding nav name or use default
+                    const navItems = [...(document.querySelectorAll('.nav-link'))];
+                    const activeNav = navItems.find(item => item.onclick && item.onclick.toString().includes(sectionId));
+                    if (activeNav) {
+                        pageTitle.textContent = activeNav.querySelector('span:last-child').textContent;
+                    } else {
+                        pageTitle.textContent = "MediM";
+                    }
+                }
+
                 if (currentUser) loadSectionData(sectionId);
             }
 
@@ -1320,7 +1421,7 @@
 
             function updateUI() {
                 const navMenu = document.getElementById("navMenu");
-                const userMenu = document.getElementById("userMenu");
+                const userSpecificControls = document.getElementById("userSpecificControls");
                 const appContainer = document.querySelector(".app");
                 const sidebar = document.querySelector(".sidebar");
                 const sidebarToggle = document.getElementById("sidebarToggle");
@@ -1328,14 +1429,15 @@
                 navMenu.innerHTML = "";
 
                 if (!currentUser) {
-                    userMenu.style.display = "none";
+                    if (userSpecificControls) userSpecificControls.style.display = "none";
                     if (sidebar) sidebar.style.display = "none";
                     if (sidebarToggle) sidebarToggle.style.display = "none";
                     if (appContainer) appContainer.style.gridTemplateColumns = "1fr";
+                    showSection("loginSection"); // Ensure we show login if not logged in
                     return;
                 }
 
-                userMenu.style.display = "flex";
+                if (userSpecificControls) userSpecificControls.style.display = "flex";
                 if (sidebar) sidebar.style.display = "flex";
                 if (sidebarToggle) sidebarToggle.style.display = "flex";
                 if (appContainer) appContainer.style.gridTemplateColumns = "";
@@ -1351,6 +1453,10 @@
                         {
                             id: "dashboardAdminSection",
                             name: "📊 Datos",
+                        },
+                        {
+                            id: "pendientesAdminSection",
+                            name: "📋 Pendientes",
                         },
                         {
                             id: "gestionPacientesSection",
@@ -1478,6 +1584,11 @@
                     sectionId === "gestionCitasSection"
                 ) {
                     await loadAppointmentsAdmin();
+                } else if (
+                    sectionId === "pendientesAdminSection"
+                ) {
+                    // No dynamic data yet, but hook is ready
+                    console.log("Cargando pendientes...");
                 }
             }
 
@@ -1511,6 +1622,7 @@
                 const { data, error } = await supabaseClient
                     .from("pacientes")
                     .select("*")
+                    .neq("email", currentUser.email) // Filter out the current admin
                     .order("created_at", { ascending: false });
 
                 if (data && data.length > 0) {
@@ -1587,11 +1699,30 @@
                     `;
                     
                     if (historyContainer) {
-                        historyContainer.innerHTML = `
-                            <ul style="padding-left: 20px; color: var(--text-dim);">
-                                <li><em>Sin antecedentes registrados. Sistema listo para recolección de datos.</em></li>
-                            </ul>
-                        `;
+                        historyContainer.innerHTML = '<em>Cargando historial...</em>';
+                        const { data: historyData } = await supabaseClient
+                            .from("indicadores_salud")
+                            .select("notas, fecha_registro")
+                            .eq("paciente_id", currentUser.id)
+                            .like("notas", "[HISTORIAL]%");
+
+                        if (historyData && historyData.length > 0) {
+                            historyContainer.innerHTML = `
+                                <ul style="padding-left: 20px; color: var(--text);">
+                                    ${historyData.map(h => {
+                                        const date = new Date(h.fecha_registro).toLocaleDateString();
+                                        const disease = h.notas.replace('[HISTORIAL] ', '');
+                                        return `<li><strong>${disease}</strong> <span style="font-size: 11px; color: var(--text-light)">(${date})</span></li>`;
+                                    }).join('')}
+                                </ul>
+                            `;
+                        } else {
+                            historyContainer.innerHTML = `
+                                <ul style="padding-left: 20px; color: var(--text-dim);">
+                                    <li><em>Sin antecedentes registrados. Sistema listo para recolección de datos.</em></li>
+                                </ul>
+                            `;
+                        }
                     }
                     
                     if (predictionsContainer) {
@@ -1619,10 +1750,12 @@
                 const {
                     data: metricsData,
                     error: metricsError,
-                } = await supabaseClient.functions.invoke(
-                    "health-metrics/metrics",
-                    { method: "GET" },
-                );
+                } = await supabaseClient
+                    .from("indicadores_salud")
+                    .select("*")
+                    .eq("paciente_id", currentUser.id)
+                    .order("fecha_registro", { ascending: false })
+                    .limit(1);
                 const metricsContainer = document
                     .getElementById("healthMetricsContainer");
                 const alertsContainer = document.getElementById(
@@ -1672,12 +1805,14 @@
 
                 // 2. Cargar Próxima Cita
                 const { data: appData } = await supabaseClient
-                    .functions.invoke("gamification-service/appointments");
-                const appts = appData || [];
-                const upcoming = appts.find((a) =>
-                    a.estado === "pendiente" ||
-                    a.estado === "confirmada"
-                );
+                    .from("citas")
+                    .select("*")
+                    .eq("paciente_id", currentUser.id)
+                    .in("estado", ["pendiente", "confirmada"])
+                    .order("fecha", { ascending: true })
+                    .limit(1);
+                
+                const upcoming = appData && appData.length > 0 ? appData[0] : null;
                 const apptsContainer = document.getElementById(
                     "nextAppointmentContainer",
                 );
@@ -1728,8 +1863,12 @@
                     "appointmentsList",
                 );
                 list.innerHTML = "<em>Cargando...</em>";
+                
                 const { data, error } = await supabaseClient
-                    .functions.invoke("gamification-service/appointments");
+                    .from('citas')
+                    .select('*')
+                    .eq('paciente_id', currentUser.id)
+                    .order('fecha', { ascending: true });
 
                 if (data && data.length > 0) {
                     list.innerHTML = data.map((c) => `
@@ -1822,28 +1961,14 @@
                 const specialityBox = document.getElementById(
                     "speciality",
                 );
-                const data = {
-                    fecha: new Date(
-                        document.getElementById(
-                            "appointmentDate",
-                        ).value,
-                    ).toISOString(),
-                    motivo:
-                        document.getElementById(
-                            "appointmentReason",
-                        ).value,
-                    especialidad:
-                        specialityBox
-                            .options[
-                                specialityBox.selectedIndex
-                            ].text,
-                };
-
-                const { error } = await supabaseClient.functions
-                    .invoke("gamification-service/appointments", {
-                        method: "POST",
-                        body: data,
-                    });
+                
+                const { error } = await supabaseClient.from('citas').insert({
+                    paciente_id: currentUser.id,
+                    fecha: new Date(document.getElementById("appointmentDate").value).toISOString(),
+                    motivo: document.getElementById("appointmentReason").value,
+                    especialidad: specialityBox.options[specialityBox.selectedIndex].text,
+                    estado: 'pendiente'
+                });
 
                 btn.textContent = originalText;
                 btn.disabled = false;
@@ -1857,6 +1982,9 @@
                 alert("Cita solicitada exitosamente");
                 closeModal("newAppointmentModal");
                 loadPatientAppointments();
+                if (document.getElementById('dashboardPacienteSection').classList.contains('active')) {
+                    loadPatientDashboard();
+                }
             }
 
             async function cancelAppointment(id) {
@@ -1870,11 +1998,11 @@
                     )
                 ) return;
 
-                const { error } = await supabaseClient.functions
-                    .invoke(`gamification-service/appointments/${id}`, {
-                        method: "DELETE",
-                        body: { id },
-                    });
+                const { error } = await supabaseClient
+                    .from('citas')
+                    .update({ estado: 'cancelada' })
+                    .eq('id', id);
+
                 if (error) {
                     alert(
                         "Error al cancelar: " + error.message,
@@ -1882,13 +2010,40 @@
                     return;
                 }
                 alert("Cita cancelada correctamente");
-                closeModal("appointmentModal");
                 
                 // Recargar las vistas de citas y dashboard
                 loadPatientAppointments();
                 if (document.getElementById('dashboardPacienteSection').classList.contains('active')) {
                     loadPatientDashboard();
                 }
+            }
+
+            async function handleAddHistory(e) {
+                e.preventDefault();
+                const btn = e.target.querySelector("button");
+                const originalText = btn.textContent;
+                btn.textContent = "Guardando...";
+                btn.disabled = true;
+
+                const condition = document.getElementById("historyCondition").value;
+
+                const { error } = await supabaseClient.from('indicadores_salud').insert({
+                    paciente_id: currentUser.id,
+                    notas: `[HISTORIAL] ${condition}`,
+                });
+
+                btn.textContent = originalText;
+                btn.disabled = false;
+
+                if (error) {
+                    alert("No se pudo guardar: " + error.message);
+                    return;
+                }
+                
+                alert("Antecedente registrado exitosamente");
+                document.getElementById("historyCondition").value = "";
+                closeModal("addHistoryModal");
+                loadPatientProfile();
             }
 
             async function handleSaveMetrics(e) {
