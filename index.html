@@ -57,6 +57,11 @@
                 --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
             }
 
+            .dark-theme .logo-img {
+                filter: grayscale(1) invert(1) brightness(1.7);
+                mix-blend-mode: screen;
+            }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -581,6 +586,16 @@
                     background: var(--bg-card);
                 }
                 .app.mobile-menu-open .sidebar { left: 0; }
+                
+                /* Override Desktop collapsed-mode hiding text */
+                .app.collapsed-mode .nav-link span:last-child,
+                .app.collapsed-mode .logo span:last-child {
+                    display: inline !important;
+                }
+                .app.collapsed-mode .nav-link {
+                    justify-content: flex-start !important;
+                    padding: 12px 16px !important;
+                }
                 
                 .content { padding: 12px 8px; overflow-x: hidden; }
                 .header { padding: 12px 8px; gap: 8px; }
