@@ -145,20 +145,31 @@
             .nav-link {
                 display: flex;
                 align-items: center;
-                gap: 14px;
-                padding: 14px 18px;
-                border-radius: var(--radius-md);
-                color: var(--text-dim);
-                text-decoration: none;
+                gap: 12px;
+                padding: 12px 16px;
+                border-radius: var(--radius-sm);
                 cursor: pointer;
-                transition: var(--transition);
+                transition: all 0.2s ease-in-out;
+                font-weight: 500;
+                color: var(--text-dim);
                 border: 1px solid transparent;
                 background: transparent;
                 font-size: 15px;
-                font-weight: 500;
                 width: 100%;
                 text-align: left;
                 white-space: nowrap;
+            }
+
+            .nav-link:hover {
+                background: rgba(14, 165, 233, 0.08); /* Primary color low opacity */
+                color: var(--primary);
+                transform: translateX(4px);
+            }
+
+            .nav-item.active .nav-link {
+                background: var(--primary);
+                color: white;
+                box-shadow: 0 4px 10px rgba(14, 165, 233, 0.2);
             }
 
             .app.collapsed-mode .nav-link {
@@ -168,19 +179,6 @@
 
             .app.collapsed-mode .nav-link span:last-child {
                 display: none;
-            }
-
-            .nav-link:hover {
-                background: var(--secondary);
-                color: var(--primary);
-            }
-
-            .nav-link.active {
-                background: rgba(14, 165, 233, 0.1);
-                color: var(--primary);
-                font-weight: 600;
-                border-right: 3px solid var(--primary);
-                border-radius: var(--radius-sm) 0 0 var(--radius-sm);
             }
 
             /* Main Content */
@@ -1267,7 +1265,25 @@
             </div>
         </div>
 
-        <!-- Modal: New Patient (Admin) -->
+        <!-- Modal: Admin View Patient Details -->
+        <div class="modal" id="adminPatientModal">
+            <div class="modal-content" style="max-width: 600px;">
+                <h3 class="modal-header" id="adminPatientTitle">Cargando Perfil...</h3>
+                <div id="adminPatientContent" style="margin-bottom: 24px;"></div>
+                
+                <h4 style="margin-bottom: 12px;">Acciones de Médico</h4>
+                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                    <button class="btn btn-primary" onclick="closeModal('adminPatientModal'); showModal('metricsModal');">📝 Añadir Diagnóstico / Métricas</button>
+                    <!-- <button class="btn btn-secondary">Cargar Archivo</button> -->
+                </div>
+
+                <div style="text-align: right;">
+                    <button class="btn btn-secondary" onclick="closeModal('adminPatientModal'); adminTargetPatientId = null;">Cerrar Perfil</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Nuevo Paciente (Admin) -->
         <div class="modal" id="newPatientModal">
             <div class="modal-content">
                 <h3 class="modal-header">Registrar Nuevo Paciente</h3>
@@ -1396,6 +1412,7 @@
             let currentUser = null;
             let userRole = null;
             let supabaseClient = null;
+            let adminTargetPatientId = null;
 
             // ==================== FUNCIONES CORE ====================
             function showSection(sectionId) {
@@ -1719,7 +1736,7 @@
                                 <p>${p.email} | Nivel: ${p.nivel}</p>
                             </div>
                             <div class="list-item-actions">
-                                <button class="btn btn-secondary btn-small" onclick="alert('Funcionalidad en desarrollo')">Ver Perfil</button>
+                                <button class="btn btn-secondary btn-small" onclick="viewAdminPatient('${p.auth_uid}')">Ver Perfil</button>
                             </div>
                         </div>
                     `).join("");
@@ -1828,6 +1845,56 @@
                     if (historyContainer) historyContainer.innerHTML = '';
                     if (predictionsContainer) predictionsContainer.innerHTML = '';
                     if (conditionsContainer) conditionsContainer.innerHTML = '';
+                }
+            }
+
+            async function viewAdminPatient(patientUid) {
+                adminTargetPatientId = patientUid; 
+                showModal('adminPatientModal');
+                const content = document.getElementById('adminPatientContent');
+                const title = document.getElementById('adminPatientTitle');
+                
+                content.innerHTML = '<em>Cargando expediente...</em>';
+                
+                const { data: p } = await supabaseClient
+                    .from("pacientes")
+                    .select("*")
+                    .eq("auth_uid", patientUid)
+                    .single();
+                
+                if (p) {
+                    title.textContent = `Expediente: ${p.nombre} ${p.apellido || ''}`;
+                    const age = p.fecha_nacimiento ? Math.floor((new Date() - new Date(p.fecha_nacimiento)) / 31557600000) : 'Desconocida';
+                    
+                    // Fetch latest metrics
+                    const { data: metrics } = await supabaseClient.from("indicadores_salud")
+                        .select("*").eq("paciente_id", patientUid)
+                        .order("fecha_registro", { ascending: false }).limit(3);
+
+                    let metricsHtml = '<em>No hay métricas recientes.</em>';
+                    if (metrics && metrics.length > 0) {
+                        metricsHtml = metrics.map(m => `
+                            <div style="background: var(--bg-main); padding: 12px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--primary);">
+                                <div style="font-size: 12px; color: var(--text-light);">${new Date(m.fecha_registro).toLocaleDateString()}</div>
+                                <div>Presión: <b>${m.presion || '-'}</b> | Glucosa: <b>${m.glucosa || '-'}</b> | Peso: <b>${m.peso || '-'} kg</b></div>
+                                <div style="font-size: 13px; margin-top: 4px; color: var(--text-main);">${m.notas || ''}</div>
+                            </div>
+                        `).join('');
+                    }
+
+                    content.innerHTML = `
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                            <div><b>Email:</b> ${p.email}</div>
+                            <div><b>Teléfono:</b> ${p.telefono || '-'}</div>
+                            <div><b>Edad:</b> ${age} años</div>
+                            <div><b>Nivel:</b> ${p.nivel}</div>
+                        </div>
+                        <h4 style="margin-bottom: 12px;">Últimas Anotaciones / Métricas</h4>
+                        ${metricsHtml}
+                    `;
+                } else {
+                    title.textContent = 'Error';
+                    content.innerHTML = 'No se pudo cargar el perfil del paciente.';
                 }
             }
 
@@ -2149,7 +2216,7 @@
                 }
 
                 const data = {
-                    paciente_id: currentUser.id,
+                    paciente_id: adminTargetPatientId ? adminTargetPatientId : currentUser.id,
                     peso: parseFloat(document.getElementById("weight").value),
                     temperatura: document.getElementById("temperature").value ? parseFloat(document.getElementById("temperature").value) : null,
                     notas: patientNotes,
@@ -2174,6 +2241,8 @@
                     return;
                 }
                 alert("Indicadores guardados exitosamente");
+                adminTargetPatientId = null;
+                document.getElementById("metricsNotes").value = "";
                 closeModal("metricsModal");
                 // Recargar datos
                 loadPatientDashboard();
