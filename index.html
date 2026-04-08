@@ -573,11 +573,22 @@
 
             @media (max-width: 768px) {
                 .app { grid-template-columns: 1fr; }
-                .sidebar { display: none; }
-                .content { padding: 16px; overflow-x: hidden; }
-                .header { padding: 16px; }
-                .grid { grid-template-columns: 1fr; }
-                .modal-content { max-height: 90vh; max-width: 95%; margin: 5% auto; overflow-y: auto; }
+                .sidebar.hidden-mobile { display: none !important; }
+                .sidebar { 
+                    position: fixed; 
+                    top: 0; left: -100%; height: 100vh; width: 280px; 
+                    z-index: 1000; box-shadow: 2px 0 10px rgba(0,0,0,0.2); 
+                    transition: left 0.3s ease; 
+                    background: var(--bg-card);
+                }
+                .app.mobile-menu-open .sidebar { left: 0; }
+                
+                .content { padding: 12px; overflow-x: hidden; }
+                .header { padding: 12px; }
+                .grid { grid-template-columns: 1fr !important; display: flex; flex-direction: column; gap: 16px; }
+                .card { text-align: center; } /* Center text */
+                .card-header, .list-item, .alert { text-align: left; }
+                .modal-content { max-height: 90vh; max-width: 95%; margin: 5% auto; overflow-y: auto; padding: 20px;}
             }
 
             /* Human Body Interactions */
@@ -1388,6 +1399,10 @@
 
             // ==================== FUNCIONES CORE ====================
             function showSection(sectionId) {
+                if (window.innerWidth <= 768) {
+                    document.querySelector('.app').classList.remove('mobile-menu-open');
+                }
+                
                 document.querySelectorAll(".section").forEach(
                     (s) => s.classList.remove("active")
                 );
@@ -1508,8 +1523,8 @@
                 }
 
                 if (userSpecificControls) userSpecificControls.style.display = "flex";
-                if (sidebar) sidebar.style.display = "flex";
-                if (sidebarToggle) sidebarToggle.style.display = "flex";
+                if (sidebar) sidebar.style.display = ""; // Vuelve a su estado dictado por CSS
+                if (sidebarToggle) sidebarToggle.style.display = ""; 
                 if (appContainer) appContainer.style.gridTemplateColumns = "";
 
                 document.getElementById("userName")
@@ -2241,12 +2256,16 @@
             // ==================== SIDEBAR COLLAPSE ====================
             function toggleSidebar() {
                 const appContent = document.querySelector('.app');
-                appContent.classList.toggle('collapsed-mode');
-                
-                if (appContent.classList.contains('collapsed-mode')) {
-                    localStorage.setItem('luxhealth_sidebar', 'collapsed');
+                if (window.innerWidth <= 768) {
+                    appContent.classList.toggle('mobile-menu-open');
                 } else {
-                    localStorage.setItem('luxhealth_sidebar', 'expanded');
+                    appContent.classList.toggle('collapsed-mode');
+                    
+                    if (appContent.classList.contains('collapsed-mode')) {
+                        localStorage.setItem('luxhealth_sidebar', 'collapsed');
+                    } else {
+                        localStorage.setItem('luxhealth_sidebar', 'expanded');
+                    }
                 }
             }
 
